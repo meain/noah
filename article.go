@@ -1,14 +1,24 @@
 package main
 
+// TODO(meain): make content converted to markdown available (use ff readbility)
+// Also have to have a documentation of the supported fields somewhere
+
 import (
 	"net/http"
-	"time"
+	"net/url"
 
 	"golang.org/x/net/html"
 )
 
-func getArticleData(url string) (map[string]string, error) {
-	resp, err := http.Get(url)
+func getArticleData(input string) (map[string]string, error) {
+	parsedURL, err := url.Parse(input)
+	if err != nil {
+		return nil, err
+	}
+
+	host := parsedURL.Host
+
+	resp, err := http.Get(input)
 	if err != nil {
 		return nil, err
 	}
@@ -22,8 +32,8 @@ func getArticleData(url string) (map[string]string, error) {
 
 	return map[string]string{
 		"Title":  getTitle(doc),
-		"URL":    url,
-		"Date":   time.Now().Format(dateFormat),
+		"URL":    input,
+		"Host":   host,
 		"Author": getAuthor(doc),
 	}, nil
 }

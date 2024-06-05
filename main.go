@@ -5,6 +5,7 @@ import (
 	"html/template"
 	"os"
 	"path"
+	"time"
 )
 
 const (
@@ -36,6 +37,9 @@ func main() {
 	if err != nil {
 		printError(err.Error())
 	}
+
+	// Augment initial data
+	data["Date"] = time.Now().Format(dateFormat)
 
 	err = tmpl.Execute(os.Stdout, data)
 	if err != nil {
