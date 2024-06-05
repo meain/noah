@@ -4,9 +4,12 @@ package main
 // Also have to have a documentation of the supported fields somewhere
 
 import (
+	"bytes"
+	"io"
 	"net/http"
 	"net/url"
 
+	md "github.com/JohannesKaufmann/html-to-markdown"
 	"golang.org/x/net/html"
 )
 
@@ -25,16 +28,30 @@ func getArticleData(input string) (map[string]string, error) {
 
 	defer resp.Body.Close()
 
-	doc, err := html.Parse(resp.Body)
+	content, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	doc, err := html.Parse(bytes.NewReader(content))
+	if err != nil {
+		return nil, err
+	}
+
+	converter := md.NewConverter("", true, nil)
+
+	markdown, err := converter.ConvertString(string(content))
 	if err != nil {
 		return nil, err
 	}
 
 	return map[string]string{
-		"Title":  getTitle(doc),
-		"URL":    input,
-		"Host":   host,
-		"Author": getAuthor(doc),
+		"Title":           getTitle(doc),
+		"URL":             input,
+		"Host":            host,
+		"Author":          getAuthor(doc),
+		"HTMLContent":     string(content),
+		"MarkdownContent": markdown,
 	}, nil
 }
 

@@ -19,12 +19,12 @@ func printError(msg string) {
 
 func main() {
 	if len(os.Args) != 2 {
-		os.Stderr.WriteString("Usage: noah <url>")
+		os.Stderr.WriteString("Usage: noah <input>")
 		os.Exit(1)
 	}
 
-	url := os.Args[1]
-	templateType := getTempplateType(url)
+	input := os.Args[1]
+	templateType := getTempplateType(input)
 	templatePath := getTemplate(templateType)
 	templateName := path.Base(templatePath)
 
@@ -33,13 +33,17 @@ func main() {
 		printError(err.Error())
 	}
 
-	data, err := getData(url, templateType)
+	data, err := getData(input, templateType)
 	if err != nil {
 		printError(err.Error())
 	}
 
 	// Augment initial data
+	data["Input"] = input
 	data["Date"] = time.Now().Format(dateFormat)
+	data["Time"] = time.Now().Format(time.Kitchen)
+	data["ISODateTime"] = time.Now().Format(time.RFC3339)
+	data["TemplateType"] = templateType
 
 	err = tmpl.Execute(os.Stdout, data)
 	if err != nil {
