@@ -7,3 +7,6 @@ Usage: noah <link>
 - I think we should think of it as templateing but with variables passed in by a go program
 
 - The config should be able to provide llm prompts which we can used to generate additional data within the page. for examaple summary or to generate tags
+
+- users shold be able to write custom parsers to detect the template type to use and the url to be generated
+  for exmple if the user passes in COR-123 we should be able to construct the linear url and identify that this ia a linear ticket url
