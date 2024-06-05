@@ -15,31 +15,41 @@ const (
 	dateFormat = "2006-01-02"
 )
 
+func printError(msg string) {
+	os.Stderr.WriteString("[ERROR]" + msg)
+	os.Exit(2)
+}
+
 func main() {
 	if len(os.Args) != 2 {
-		fmt.Println("Usage: noah <url>")
+		os.Stderr.WriteString("Usage: noah <url>")
 		os.Exit(1)
 	}
 
 	url := os.Args[1]
-	templateType := TemplateTypeArticle // TODO(meain): parse from url
+	templateType := getTempplateType(url)
 	templatePath := getTemplate(templateType)
 	templateName := path.Base(templatePath)
 
 	tmpl, err := template.New(templateName).ParseFiles(templatePath)
 	if err != nil {
-		fmt.Println("[ERROR]", err.Error())
+		printError(err.Error())
 	}
 
 	data, err := getData(url, templateType)
 	if err != nil {
-		fmt.Println("[ERROR]", err.Error())
+		printError(err.Error())
 	}
 
 	err = tmpl.Execute(os.Stdout, data)
 	if err != nil {
-		fmt.Println("[ERROR]", err.Error())
+		printError(err.Error())
 	}
+}
+
+func getTempplateType(_ string) string {
+	// TODO(meain): parse from url
+	return TemplateTypeArticle
 }
 
 func getTemplate(templateType string) string {
