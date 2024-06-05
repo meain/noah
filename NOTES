@@ -1,0 +1,7 @@
+Usage: noah <link>
+
+- You should be able to configure the keys that it will auto populate for each kind of resource
+- The tool should automatically detect the kind of resoruce if it can and if not default to something
+  - Users can specify the kind of resource if they want to force a type
+- There should be some generic optinos like `consumed date` for which the config would look like `consumed: $date`
+- I think we should think of it as templateing but with variables passed in by a go program
