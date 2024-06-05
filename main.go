@@ -3,12 +3,8 @@ package main
 import (
 	"fmt"
 	"html/template"
-	"net/http"
 	"os"
 	"path"
-	"time"
-
-	"golang.org/x/net/html"
 )
 
 const (
@@ -64,41 +60,4 @@ func getData(url string, templateType string) (map[string]string, error) {
 		return getArticleData(url)
 	}
 	return nil, fmt.Errorf("unknown template type: %s", templateType)
-}
-
-func getArticleData(url string) (map[string]string, error) {
-	// fetch html from page
-	resp, err := http.Get(url)
-	if err != nil {
-		return nil, err
-	}
-
-	defer resp.Body.Close()
-
-	doc, err := html.Parse(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-
-	title := getTitle(doc)
-	return map[string]string{
-		"Title": title,
-		"URL":   url,
-		"Date":  time.Now().Format(dateFormat),
-	}, nil
-}
-
-func getTitle(htmlNode *html.Node) string {
-	if htmlNode.Type == html.ElementNode && htmlNode.Data == "title" {
-		if htmlNode.FirstChild != nil {
-			return htmlNode.FirstChild.Data
-		}
-	}
-	for child := htmlNode.FirstChild; child != nil; child = child.NextSibling {
-		title := getTitle(child)
-		if len(title) != 0 {
-			return title
-		}
-	}
-	return ""
 }
