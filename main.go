@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
 	"time"
 
 	"github.com/alecthomas/kong"
@@ -62,7 +63,13 @@ func doIt(input, outDir string, force bool) {
 
 	outFile := os.Stdout
 	if len(outDir) != 0 {
-		fileName := it.getFileName(data) // fileName might also contain a dir
+		// fileName might also contain a dir
+		fileName := filepath.Clean(it.getFileName(data))
+
+		// Cleanup the filename
+		invalidChars := regexp.MustCompile(`[^a-zA-Z0-9_\-\. :]`)
+		fileName = invalidChars.ReplaceAllString(fileName, "_")
+
 		fullPath := filepath.Join(outDir, fileName)
 
 		if _, err := os.Stat(fullPath); err == nil {
