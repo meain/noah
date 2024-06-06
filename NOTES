@@ -10,3 +10,5 @@ Usage: noah <link>
 
 - users shold be able to write custom parsers to detect the template type to use and the url to be generated
   for exmple if the user passes in COR-123 we should be able to construct the linear url and identify that this ia a linear ticket url
+
+- -w flag should write to a folder, filename should be configuratble by user

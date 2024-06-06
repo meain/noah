@@ -4,6 +4,7 @@ go 1.22.2
 
 require (
 	github.com/JohannesKaufmann/html-to-markdown v1.6.0
+	github.com/alecthomas/kong v0.9.0
 	golang.org/x/net v0.26.0
 )
 
