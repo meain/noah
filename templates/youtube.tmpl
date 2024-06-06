@@ -10,4 +10,6 @@ consumed: "{{.Date}}"
 
 ```embed
 url: {{.URL}}
-```
+```{{if .Chapters}}
+
+{{range .Chapters}}[{{.Title}}]({{$.URL}}&t={{.StartTime}}) {{end}}{{end}}

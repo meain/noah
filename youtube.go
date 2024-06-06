@@ -2,7 +2,9 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"os/exec"
 	"path/filepath"
 	"time"
 )
@@ -30,10 +32,58 @@ type youTubeItem struct {
 	URL string
 }
 
-func (y youTubeItem) getData() (map[string]string, error) {
-	data := map[string]string{"URL": y.URL}
+func (y youTubeItem) getData() (map[string]any, error) {
+	data, err := getDataFromYtDlp(y.URL)
+	if err != nil {
+		fmt.Println("youtube.go:37 err:", err)
+		return getDataFromNoEmbed(y.URL)
+	}
 
-	resp, err := http.Get(noEmbedUrl + y.URL)
+	return data, nil
+}
+
+func getDataFromYtDlp(input string) (map[string]any, error) {
+	// check if yt-dlp available in PATH
+	_, err := exec.LookPath("yt-dlp")
+	if err != nil {
+		return map[string]any{}, err
+	}
+
+	cmd := exec.Command("yt-dlp", "--print-json", "--skip-download", input)
+	out, err := cmd.Output()
+	if err != nil {
+		return map[string]any{}, err
+	}
+
+	data := map[string]any{"URL": input}
+
+	var resp YTDlpResponse
+
+	err = json.Unmarshal(out, &resp)
+	if err != nil {
+		return data, err
+	}
+
+	data["Channel"] = resp.Channel
+	data["ChannelURL"] = resp.ChannelURL
+	data["Title"] = resp.Title
+	data["Thumbnail"] = resp.Thumbnail
+	data["Chapters"] = resp.Chapters
+	data["Views"] = resp.ViewCount
+	data["Likes"] = resp.LikeCount
+	data["Description"] = resp.Description
+	data["Duration"] = resp.Duration
+	data["Categories"] = resp.Categories
+	data["CommentCount"] = resp.CommentCount
+	// TODO: add more as required
+
+	return data, nil
+}
+
+func getDataFromNoEmbed(input string) (map[string]any, error) {
+	data := map[string]any{"URL": input}
+
+	resp, err := http.Get(noEmbedUrl + input)
 	if err != nil {
 		return data, err
 	}
@@ -56,11 +106,11 @@ func (y youTubeItem) getData() (map[string]string, error) {
 	return data, nil
 }
 
-func (y youTubeItem) getFileName(data map[string]string) string {
+func (y youTubeItem) getFileName(data map[string]any) string {
 	folder := "Youtube"
 	fileName := time.Now().Format("2006-01-02 15:04:05")
 
-	title, ok := data["Title"]
+	title, ok := data["Title"].(string)
 	if ok {
 		fileName = title
 	}

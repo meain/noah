@@ -19,7 +19,7 @@ type articleItem struct {
 	URL string
 }
 
-func (a articleItem) getData() (map[string]string, error) {
+func (a articleItem) getData() (map[string]any, error) {
 	parsedURL, err := url.Parse(a.URL)
 	if err != nil {
 		return nil, err
@@ -51,7 +51,7 @@ func (a articleItem) getData() (map[string]string, error) {
 		return nil, err
 	}
 
-	return map[string]string{
+	return map[string]any{
 		"Title":           getTitle(doc),
 		"URL":             a.URL,
 		"Host":            host,
@@ -61,13 +61,13 @@ func (a articleItem) getData() (map[string]string, error) {
 	}, nil
 }
 
-func (y articleItem) getFileName(data map[string]string) string {
+func (y articleItem) getFileName(data map[string]any) string {
 	folder := "Article"
 	fileName := time.Now().Format("2006-01-02 15:04:05")
 
 	title, ok := data["Title"]
 	if ok {
-		fileName = title
+		fileName = title.(string)
 	}
 
 	return filepath.Join(folder, fileName+".md")
