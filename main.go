@@ -20,6 +20,7 @@ func printError(msg string) {
 
 var cli struct {
 	Input  string `arg:"" optional:"" name:"input" help:"Item to fetch metadata"`
+	Force  bool   `optional:"" short:"f" name:"force" help:"Overwrite existing files"`
 	Output string `optional:"" short:"o" name:"output" help:"Directory to write out metadata file"`
 }
 
@@ -27,14 +28,14 @@ func main() {
 	ctx := kong.Parse(&cli)
 	switch ctx.Command() {
 	case "<input>":
-		doIt(cli.Input, cli.Output)
+		doIt(cli.Input, cli.Output, cli.Force)
 	default:
 		os.Stderr.WriteString("Usage: noah [arguments] <input>")
 		os.Exit(1)
 	}
 }
 
-func doIt(input, outDir string) {
+func doIt(input, outDir string, force bool) {
 	templateType := getTemplateType(input)
 
 	it, err := getItem(input, templateType)
@@ -65,7 +66,10 @@ func doIt(input, outDir string) {
 		fullPath := filepath.Join(outDir, fileName)
 
 		if _, err := os.Stat(fullPath); err == nil {
-			printError("file already exists: " + fileName)
+			if !force {
+				os.Stdout.WriteString(fmt.Sprintf("File already exists: %s\n", filepath.Base(fullPath)))
+				os.Exit(0)
+			}
 		}
 
 		err := os.MkdirAll(filepath.Dir(fullPath), os.ModePerm)
