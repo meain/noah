@@ -1,0 +1,3 @@
+check:
+	gofumpt . >/dev/null
+	# exhaustive ./...

@@ -12,7 +12,7 @@
             pname = "noah";
             version = "dev";
             src = ./.;
-	    vendorHash = null;
+            vendorHash = "sha256-UAxlIvsQ2METzSJJb/uJf5jl5sHSscvyIlQNivvXQa8=";
             doCheck = false;
           };
 
@@ -22,7 +22,15 @@
         devShells.default = pkgs.mkShell {
           # needed for dlv to work (https://github.com/NixOS/nixpkgs/issues/18995)
           hardeningDisable = [ "fortify" ];
-          packages = with pkgs; [ go delve ];
+          packages = with pkgs; [
+            go
+
+            # linters
+            gofumpt
+
+            # debugging
+            delve
+          ];
         };
       }
     );
