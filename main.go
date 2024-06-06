@@ -14,7 +14,7 @@ const (
 )
 
 func printError(msg string) {
-	os.Stderr.WriteString("[ERROR]" + msg)
+	os.Stderr.WriteString("[ERROR] " + msg + "\n")
 	os.Exit(2)
 }
 
@@ -35,7 +35,7 @@ func main() {
 }
 
 func doIt(input, outDir string) {
-	templateType := getTempplateType(input)
+	templateType := getTemplateType(input)
 
 	data, err := getData(input, templateType)
 	if err != nil {
@@ -80,6 +80,8 @@ func getData(url string, templateType string) (map[string]string, error) {
 	switch templateType {
 	case TemplateTypeArticle:
 		return getArticleData(url)
+	case TemplateTypeYoutube:
+		return getYouTubeData(url)
 	}
 	return nil, fmt.Errorf("unknown template type: %s", templateType)
 }
