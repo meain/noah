@@ -37,7 +37,12 @@ func main() {
 func doIt(input, outDir string) {
 	templateType := getTemplateType(input)
 
-	data, err := getData(input, templateType)
+	it, err := getItem(input, templateType)
+	if err != nil {
+		printError(err.Error())
+	}
+
+	data, err := it.getData()
 	if err != nil {
 		printError(err.Error())
 	}
@@ -56,12 +61,19 @@ func doIt(input, outDir string) {
 
 	outFile := os.Stdout
 	if len(outDir) != 0 {
-		err := os.MkdirAll(outDir, os.ModePerm)
+		fileName := it.getFileName(data) // fileName might also contain a dir
+		fullPath := filepath.Join(outDir, fileName)
+
+		if _, err := os.Stat(fullPath); err == nil {
+			printError("file already exists: " + fileName)
+		}
+
+		err := os.MkdirAll(filepath.Dir(fullPath), os.ModePerm)
 		if err != nil {
 			printError(err.Error())
 		}
 
-		outFile, err = os.Create(filepath.Join(outDir, getFileName(templateType, data)))
+		outFile, err = os.Create(fullPath)
 		if err != nil {
 			printError(err.Error())
 		}
@@ -76,12 +88,12 @@ func doIt(input, outDir string) {
 	}
 }
 
-func getData(url string, templateType string) (map[string]string, error) {
+func getItem(url string, templateType string) (Item, error) {
 	switch templateType {
 	case TemplateTypeArticle:
-		return getArticleData(url)
+		return articleItem{url}, nil
 	case TemplateTypeYoutube:
-		return getYouTubeData(url)
+		return youTubeItem{url}, nil
 	}
 	return nil, fmt.Errorf("unknown template type: %s", templateType)
 }

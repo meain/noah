@@ -3,6 +3,8 @@ package main
 import (
 	"encoding/json"
 	"net/http"
+	"path/filepath"
+	"time"
 )
 
 type NoEmbedResponse struct {
@@ -24,10 +26,14 @@ type NoEmbedResponse struct {
 
 const noEmbedUrl = "https://noembed.com/embed?dataType=json&url="
 
-func getYouTubeData(input string) (map[string]string, error) {
-	data := map[string]string{"URL": input}
+type youTubeItem struct {
+	URL string
+}
 
-	resp, err := http.Get(noEmbedUrl + input)
+func (y youTubeItem) getData() (map[string]string, error) {
+	data := map[string]string{"URL": y.URL}
+
+	resp, err := http.Get(noEmbedUrl + y.URL)
 	if err != nil {
 		return data, err
 	}
@@ -48,4 +54,16 @@ func getYouTubeData(input string) (map[string]string, error) {
 	data["Thumbnail"] = noer.ThumbnailURL
 
 	return data, nil
+}
+
+func (y youTubeItem) getFileName(data map[string]string) string {
+	folder := "Youtube"
+	fileName := time.Now().Format("2006-01-02 15:04:05")
+
+	title, ok := data["Title"]
+	if ok {
+		fileName = title
+	}
+
+	return filepath.Join(folder, fileName+".md")
 }

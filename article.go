@@ -8,20 +8,26 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"path/filepath"
+	"time"
 
 	md "github.com/JohannesKaufmann/html-to-markdown"
 	"golang.org/x/net/html"
 )
 
-func getArticleData(input string) (map[string]string, error) {
-	parsedURL, err := url.Parse(input)
+type articleItem struct {
+	URL string
+}
+
+func (a articleItem) getData() (map[string]string, error) {
+	parsedURL, err := url.Parse(a.URL)
 	if err != nil {
 		return nil, err
 	}
 
 	host := parsedURL.Host
 
-	resp, err := http.Get(input)
+	resp, err := http.Get(a.URL)
 	if err != nil {
 		return nil, err
 	}
@@ -47,12 +53,24 @@ func getArticleData(input string) (map[string]string, error) {
 
 	return map[string]string{
 		"Title":           getTitle(doc),
-		"URL":             input,
+		"URL":             a.URL,
 		"Host":            host,
 		"Author":          getAuthor(doc),
 		"HTMLContent":     string(content),
 		"MarkdownContent": markdown,
 	}, nil
+}
+
+func (y articleItem) getFileName(data map[string]string) string {
+	folder := "Article"
+	fileName := time.Now().Format("2006-01-02 15:04:05")
+
+	title, ok := data["Title"]
+	if ok {
+		fileName = title
+	}
+
+	return filepath.Join(folder, fileName+".md")
 }
 
 func getTitle(htmlNode *html.Node) string {
