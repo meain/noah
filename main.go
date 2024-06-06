@@ -2,9 +2,7 @@ package main
 
 import (
 	"fmt"
-	"html/template"
 	"os"
-	"path"
 	"time"
 )
 
@@ -25,13 +23,6 @@ func main() {
 
 	input := os.Args[1]
 	templateType := getTempplateType(input)
-	templatePath := getTemplate(templateType)
-	templateName := path.Base(templatePath)
-
-	tmpl, err := template.New(templateName).ParseFiles(templatePath)
-	if err != nil {
-		printError(err.Error())
-	}
 
 	data, err := getData(input, templateType)
 	if err != nil {
@@ -45,21 +36,15 @@ func main() {
 	data["ISODateTime"] = time.Now().Format(time.RFC3339)
 	data["TemplateType"] = templateType
 
+	tmpl, err := getTemplate(templateType)
+	if err != nil {
+		printError(err.Error())
+	}
+
 	err = tmpl.Execute(os.Stdout, data)
 	if err != nil {
 		printError(err.Error())
 	}
-}
-
-func getTempplateType(_ string) string {
-	// TODO(meain): parse from url
-	return TemplateTypeArticle
-}
-
-func getTemplate(templateType string) string {
-	// TODO(meain): read from config
-	var tmplFile = "templates/" + templateType + ".tmpl"
-	return tmplFile
 }
 
 func getData(url string, templateType string) (map[string]string, error) {

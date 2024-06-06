@@ -58,13 +58,13 @@ func getArticleData(input string) (map[string]string, error) {
 func getTitle(htmlNode *html.Node) string {
 	if htmlNode.Type == html.ElementNode && htmlNode.Data == "title" {
 		if htmlNode.FirstChild != nil {
-			return htmlNode.FirstChild.Data
+			return maybeURLDecode(htmlNode.FirstChild.Data)
 		}
 	}
 	for child := htmlNode.FirstChild; child != nil; child = child.NextSibling {
 		title := getTitle(child)
 		if len(title) != 0 {
-			return title
+			return maybeURLDecode(title)
 		}
 	}
 	return ""
