@@ -64,13 +64,14 @@ func doIt(input, outDir string, force bool) {
 	outFile := os.Stdout
 	if len(outDir) != 0 {
 		// fileName might also contain a dir
-		fileName := filepath.Clean(it.getFileName(data))
+		filePath := filepath.Clean(it.getFileName(data))
+		fileName := filepath.Base(filePath)
 
 		// Cleanup the filename
 		invalidChars := regexp.MustCompile(`[^a-zA-Z0-9_\-\. :]`)
 		fileName = invalidChars.ReplaceAllString(fileName, "_")
 
-		fullPath := filepath.Join(outDir, fileName)
+		fullPath := filepath.Join(outDir, filepath.Dir(filePath), fileName)
 
 		if _, err := os.Stat(fullPath); err == nil {
 			if !force {
