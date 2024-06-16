@@ -85,7 +85,7 @@ type YTDlpResponse struct {
 	Width                int     `json:"width"`
 	Height               int     `json:"height"`
 	Resolution           string  `json:"resolution"`
-	Fps                  int     `json:"fps"`
+	Fps                  float64 `json:"fps"`
 	DynamicRange         string  `json:"dynamic_range"`
 	Vcodec               string  `json:"vcodec"`
 	Vbr                  float64 `json:"vbr"`
