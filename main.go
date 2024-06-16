@@ -68,7 +68,7 @@ func doIt(input, outDir string, force bool) {
 		fileName := filepath.Base(filePath)
 
 		// Cleanup the filename
-		invalidChars := regexp.MustCompile(`[^a-zA-Z0-9_\-\. :]`)
+		invalidChars := regexp.MustCompile(`[^a-zA-Z0-9_\-\. :\(\)]`)
 		fileName = invalidChars.ReplaceAllString(fileName, "_")
 
 		fullPath := filepath.Join(outDir, filepath.Dir(filePath), fileName)
